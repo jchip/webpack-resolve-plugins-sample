@@ -1,4 +1,5 @@
 const Path = require("path");
+const assert = require("assert");
 
 class Foo {
   constructor() {
@@ -45,6 +46,9 @@ class ResolvePlugin {
 
   apply(resolver) {
     resolver.plugin("module", (request, callback) => {
+      console.log("ResolvePlugin", request.request);
+      assert(request.request !== "./data");
+      //require.resolve(request.request);
       const obj = Object.assign({}, request, {
         path: Path.join(__dirname, "foo"),
         request: "./" + request.request
@@ -69,17 +73,21 @@ module.exports = {
       {
         test: /\.txt?$/,
         use: "text-loader"
+      },
+      {
+        test: /\.qqq?$/,
+        use: "qqq-loader"
       }
     ]
   },
   resolve: {
-    modules: [],
+    modules: [Path.resolve("lib")],
     plugins: [
       new ResolvePlugin()
     ]
   },
   resolveLoader: {
-    modules: [],
+    modules: [Path.resolve("lib")],
     plugins: [
       new ResolvePlugin()
     ]
